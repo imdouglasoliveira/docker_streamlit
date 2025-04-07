@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  app_service:
+    image: a8z-streamlit-indicadores:latest
+    networks:
+      - netProvectum
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.app_service.rule=Host(`seu-dominio.com`)
+        - traefik.http.routers.app_service.entrypoints=websecure
+        - traefik.http.routers.app_service.tls.certresolver=letsencryptresolver
+        - traefik.http.services.app_service.loadbalancer.server.port=8501
+    volumes:
+      - app_data:/app/data
+    environment:
+      - LANG=pt_BR.UTF-8
+      - LC_ALL=pt_BR.UTF-8
+      - LANGUAGE=pt_BR:pt
+
+networks:
+  netProvectum:
+    external: true
+
+volumes:
+  app_data:
+    external: true
